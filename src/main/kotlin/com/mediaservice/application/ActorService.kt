@@ -65,4 +65,13 @@ class ActorService(
             )
         )
     }
+
+    @Transactional
+    fun findAll(): List<ActorResponseDto>? {
+        return this.actorRepository.findAll()?.map {
+            ActorResponseDto.from(it)
+        }?.toList() ?: throw BadRequestException(
+            ErrorCode.ROW_DOES_NOT_EXIST, "THERE IS NO ACTOR"
+        )
+    }
 }

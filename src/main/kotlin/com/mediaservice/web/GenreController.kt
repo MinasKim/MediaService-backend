@@ -5,6 +5,7 @@ import com.mediaservice.application.dto.media.GenreCreateRequestDto
 import com.mediaservice.application.dto.media.GenreResponseDto
 import com.mediaservice.application.dto.media.GenreUpdateRequestDto
 import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
@@ -36,5 +37,10 @@ class GenreController(private val genreService: GenreService) {
         @PathVariable id: UUID
     ): GenreResponseDto {
         return this.genreService.delete(id)
+    }
+
+    @GetMapping
+    fun findAll(): List<GenreResponseDto>? {
+        return this.genreService.findAll()
     }
 }

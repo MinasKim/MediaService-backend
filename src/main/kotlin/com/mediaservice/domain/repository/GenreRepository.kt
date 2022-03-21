@@ -20,6 +20,12 @@ class GenreRepository {
         }
     }
 
+    fun findAll(): List<Genre>? {
+        return GenreEntity.all().map {
+            Genre.from(it)
+        }.toList()
+    }
+
     fun update(id: UUID, genre: Genre): Genre? {
         return GenreEntity.findById(id)?.let {
             it.name = genre.name

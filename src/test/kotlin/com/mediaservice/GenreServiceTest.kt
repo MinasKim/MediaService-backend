@@ -147,4 +147,31 @@ class GenreServiceTest {
         // then
         assertEquals(ErrorCode.ROW_ALREADY_DELETED, exception.errorCode)
     }
+
+    @Test
+    fun findGenre() {
+        // given
+        every { genreRepository.findAll() } returns listOf(this.genre)
+
+        // when
+        val genres = this.genreService.findAll()
+
+        // then
+        assertEquals(1, genres!!.size)
+    }
+
+    @Test
+    fun failFindGenre() {
+        // given
+        val exception = assertThrows(BadRequestException::class.java) {
+
+            every { genreRepository.findAll() } returns null
+
+            // when
+            val genres = this.genreService.findAll()
+        }
+
+        // then
+        assertEquals(ErrorCode.ROW_DOES_NOT_EXIST, exception.errorCode)
+    }
 }

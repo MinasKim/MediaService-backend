@@ -147,4 +147,31 @@ class CreatorServiceTest {
         // then
         assertEquals(ErrorCode.ROW_ALREADY_DELETED, exception.errorCode)
     }
+
+    @Test
+    fun findCreator() {
+        // given
+        every { creatorRepository.findAll() } returns listOf(this.creator)
+
+        // when
+        val creators = this.creatorService.findAll()
+
+        // then
+        assertEquals(1, creators!!.size)
+    }
+
+    @Test
+    fun failFindCreator() {
+        // given
+        val exception = assertThrows(BadRequestException::class.java) {
+
+            every { creatorRepository.findAll() } returns null
+
+            // when
+            val creators = this.creatorService.findAll()
+        }
+
+        // then
+        assertEquals(ErrorCode.ROW_DOES_NOT_EXIST, exception.errorCode)
+    }
 }

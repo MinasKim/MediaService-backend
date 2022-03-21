@@ -64,4 +64,13 @@ class CreatorService(
             )
         )
     }
+
+    @Transactional
+    fun findAll(): List<CreatorResponseDto>? {
+        return this.creatorRepository.findAll()?.map {
+            CreatorResponseDto.from(it)
+        }?.toList() ?: throw BadRequestException(
+            ErrorCode.ROW_DOES_NOT_EXIST, "THERE IS NO CREATOR"
+        )
+    }
 }

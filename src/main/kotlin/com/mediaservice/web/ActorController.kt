@@ -5,6 +5,7 @@ import com.mediaservice.application.dto.media.ActorCreateRequestDto
 import com.mediaservice.application.dto.media.ActorResponseDto
 import com.mediaservice.application.dto.media.ActorUpdateRequestDto
 import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
@@ -36,5 +37,10 @@ class ActorController(private val actorService: ActorService) {
         @PathVariable id: UUID
     ): ActorResponseDto {
         return this.actorService.delete(id)
+    }
+
+    @GetMapping
+    fun findAll(): List<ActorResponseDto>? {
+        return this.actorService.findAll()
     }
 }

@@ -65,4 +65,13 @@ class GenreService(
             )
         )
     }
+
+    @Transactional
+    fun findAll(): List<GenreResponseDto>? {
+        return this.genreRepository.findAll()?.map {
+            GenreResponseDto.from(it)
+        }?.toList() ?: throw BadRequestException(
+            ErrorCode.ROW_DOES_NOT_EXIST, "THERE IS NO GENRE"
+        )
+    }
 }

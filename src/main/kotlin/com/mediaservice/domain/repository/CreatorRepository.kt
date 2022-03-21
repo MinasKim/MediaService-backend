@@ -20,6 +20,12 @@ class CreatorRepository {
         }
     }
 
+    fun findAll(): List<Creator>? {
+        return CreatorEntity.all().map {
+            Creator.from(it)
+        }.toList()
+    }
+
     fun update(id: UUID, creator: Creator): Creator? {
         return CreatorEntity.findById(id)?.let {
             it.name = creator.name

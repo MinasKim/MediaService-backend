@@ -20,6 +20,12 @@ class ActorRepository {
         }
     }
 
+    fun findAll(): List<Actor>? {
+        return ActorEntity.all().map {
+            Actor.from(it)
+        }.toList()
+    }
+
     fun update(id: UUID, actor: Actor): Actor? {
         return ActorEntity.findById(id)?.let {
             it.name = actor.name

@@ -147,4 +147,31 @@ class ActorServiceTest {
         // then
         assertEquals(ErrorCode.ROW_ALREADY_DELETED, exception.errorCode)
     }
+
+    @Test
+    fun findActor() {
+        // given
+        every { actorRepository.findAll() } returns listOf(this.actor)
+
+        // when
+        val actors = this.actorService.findAll()
+
+        // then
+        assertEquals(1, actors!!.size)
+    }
+
+    @Test
+    fun failFindActor() {
+        // given
+        val exception = assertThrows(BadRequestException::class.java) {
+
+            every { actorRepository.findAll() } returns null
+
+            // when
+            val actors = this.actorService.findAll()
+        }
+
+        // then
+        assertEquals(ErrorCode.ROW_DOES_NOT_EXIST, exception.errorCode)
+    }
 }
