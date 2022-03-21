@@ -13,13 +13,14 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
+import javax.validation.Valid
 
 @RestController
 @RequestMapping("/api/v1/actors")
 class ActorController(private val actorService: ActorService) {
     @PostMapping("")
     fun create(
-        @RequestBody actorCreateRequestDto: ActorCreateRequestDto
+        @RequestBody @Valid actorCreateRequestDto: ActorCreateRequestDto
     ): ActorResponseDto {
         return this.actorService.create(actorCreateRequestDto)
     }
@@ -27,7 +28,7 @@ class ActorController(private val actorService: ActorService) {
     @PutMapping("/{id}")
     fun update(
         @PathVariable id: UUID,
-        @RequestBody actorUpdateRequestDto: ActorUpdateRequestDto
+        @RequestBody @Valid actorUpdateRequestDto: ActorUpdateRequestDto
     ): ActorResponseDto {
         return this.actorService.update(id, actorUpdateRequestDto)
     }

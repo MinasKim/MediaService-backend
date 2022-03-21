@@ -1,6 +1,9 @@
 package com.mediaservice.application
 
+import com.mediaservice.application.dto.media.MediaContentsActorRequestDto
 import com.mediaservice.application.dto.media.MediaContentsCreateRequestDto
+import com.mediaservice.application.dto.media.MediaContentsCreatorRequestDto
+import com.mediaservice.application.dto.media.MediaContentsGenreRequestDto
 import com.mediaservice.application.dto.media.MediaContentsResponseDto
 import com.mediaservice.application.dto.media.MediaContentsUpdateRequestDto
 import com.mediaservice.application.dto.media.MediaSeriesCreateRequestDto
@@ -13,9 +16,18 @@ import com.mediaservice.application.validator.Validator
 import com.mediaservice.domain.Like
 import com.mediaservice.domain.Media
 import com.mediaservice.domain.MediaContents
+import com.mediaservice.domain.MediaContentsActor
+import com.mediaservice.domain.MediaContentsCreator
+import com.mediaservice.domain.MediaContentsGenre
 import com.mediaservice.domain.MediaSeries
 import com.mediaservice.domain.Profile
+import com.mediaservice.domain.repository.ActorRepository
+import com.mediaservice.domain.repository.CreatorRepository
+import com.mediaservice.domain.repository.GenreRepository
 import com.mediaservice.domain.repository.LikeRepository
+import com.mediaservice.domain.repository.MediaContentsActorRepository
+import com.mediaservice.domain.repository.MediaContentsCreatorRepository
+import com.mediaservice.domain.repository.MediaContentsGenreRepository
 import com.mediaservice.domain.repository.MediaContentsRepository
 import com.mediaservice.domain.repository.MediaRepository
 import com.mediaservice.domain.repository.MediaSeriesRepository
@@ -33,6 +45,12 @@ class MediaContentsService(
     private val mediaSeriesRepository: MediaSeriesRepository,
     private val mediaContentsRepository: MediaContentsRepository,
     private val profileRepository: ProfileRepository,
+    private val actorRepository: ActorRepository,
+    private val creatorRepository: CreatorRepository,
+    private val genreRepository: GenreRepository,
+    private val mediaContentsActorRepository: MediaContentsActorRepository,
+    private val mediaContentsCreatorRepository: MediaContentsCreatorRepository,
+    private val mediaContentsGenreRepository: MediaContentsGenreRepository,
     private val likeRepository: LikeRepository
 ) {
     @Transactional(readOnly = true)
@@ -121,7 +139,7 @@ class MediaContentsService(
         val mediaList: List<Media> = this.mediaRepository.findByMediaSeriesId(mediaSeriesForDelete.id!!)
 
         mediaList.stream().forEach {
-            this.mediaRepository.deleteById(it.id)
+            this.mediaRepository.deleteById(it.id!!)
         }
 
         return MediaSeriesResponseDto.from(mediaSeriesForDelete)
@@ -251,12 +269,173 @@ class MediaContentsService(
             val mediaList: List<Media> = this.mediaRepository.findByMediaSeriesId(mediaSeries.id!!)
 
             mediaList.stream().forEach { media ->
-                this.mediaRepository.deleteById(media.id)
+                this.mediaRepository.deleteById(media.id!!)
             }
         }
 
         return MediaContentsResponseDto.from(
             mediaContentsForDelete,
+            listOf(),
+            listOf(),
+            false
+        )
+    }
+
+    @Transactional
+    fun createMediaContentsActor(
+        id: UUID,
+        mediaContentsActorRequestDto: MediaContentsActorRequestDto
+    ): MediaContentsResponseDto {
+        val mediaContents = mediaContentsRepository.findById(id) ?: throw BadRequestException(
+            ErrorCode.ROW_DOES_NOT_EXIST,
+            "NO SUCH MEDIA CONTENTS $id"
+        )
+
+        mediaContentsActorRequestDto.actorList.forEach {
+            val actor = actorRepository.findById(it) ?: throw BadRequestException(
+                ErrorCode.ROW_DOES_NOT_EXIST,
+                "NO SUCH ACTOR $it"
+            )
+            mediaContentsActorRepository.save(MediaContentsActor.of(mediaContents, actor))
+        }
+
+        return MediaContentsResponseDto.from(
+            mediaContents,
+            listOf(),
+            listOf(),
+            false
+        )
+    }
+
+    @Transactional
+    fun deleteMediaContentsActor(
+        id: UUID,
+        mediaContentsActorRequestDto: MediaContentsActorRequestDto
+    ): MediaContentsResponseDto {
+        val mediaContents = mediaContentsRepository.findById(id) ?: throw BadRequestException(
+            ErrorCode.ROW_DOES_NOT_EXIST,
+            "NO SUCH MEDIA CONTENTS $id"
+        )
+
+        mediaContentsActorRequestDto.actorList.forEach {
+            val actor = actorRepository.findById(it) ?: throw BadRequestException(
+                ErrorCode.ROW_DOES_NOT_EXIST,
+                "NO SUCH ACTOR $it"
+            )
+
+            mediaContentsActorRepository.delete(MediaContentsActor.of(mediaContents, actor))
+        }
+
+        return MediaContentsResponseDto.from(
+            mediaContents,
+            listOf(),
+            listOf(),
+            false
+        )
+    }
+
+    @Transactional
+    fun createMediaContentsCreator(
+        id: UUID,
+        mediaContentsCreatorRequestDto: MediaContentsCreatorRequestDto
+    ): MediaContentsResponseDto {
+        val mediaContents = mediaContentsRepository.findById(id) ?: throw BadRequestException(
+            ErrorCode.ROW_DOES_NOT_EXIST,
+            "NO SUCH MEDIA CONTENTS $id"
+        )
+
+        mediaContentsCreatorRequestDto.creatorList.forEach {
+            val creator = creatorRepository.findById(it) ?: throw BadRequestException(
+                ErrorCode.ROW_DOES_NOT_EXIST,
+                "NO SUCH CREATOR $it"
+            )
+
+            mediaContentsCreatorRepository.save(MediaContentsCreator.of(mediaContents, creator))
+        }
+
+        return MediaContentsResponseDto.from(
+            mediaContents,
+            listOf(),
+            listOf(),
+            false
+        )
+    }
+
+    @Transactional
+    fun deleteMediaContentsCreator(
+        id: UUID,
+        mediaContentsCreatorRequestDto: MediaContentsCreatorRequestDto
+    ): MediaContentsResponseDto {
+        val mediaContents = mediaContentsRepository.findById(id) ?: throw BadRequestException(
+            ErrorCode.ROW_DOES_NOT_EXIST,
+            "NO SUCH MEDIA CONTENTS $id"
+        )
+
+        mediaContentsCreatorRequestDto.creatorList.forEach {
+            val creator = creatorRepository.findById(it) ?: throw BadRequestException(
+                ErrorCode.ROW_DOES_NOT_EXIST,
+                "NO SUCH CREATOR $it"
+            )
+
+            mediaContentsCreatorRepository.delete(MediaContentsCreator.of(mediaContents, creator))
+        }
+
+        return MediaContentsResponseDto.from(
+            mediaContents,
+            listOf(),
+            listOf(),
+            false
+        )
+    }
+
+    @Transactional
+    fun createMediaContentsGenre(
+        id: UUID,
+        mediaContentsGenreRequestDto: MediaContentsGenreRequestDto
+    ): MediaContentsResponseDto {
+        val mediaContents = mediaContentsRepository.findById(id) ?: throw BadRequestException(
+            ErrorCode.ROW_DOES_NOT_EXIST,
+            "NO SUCH MEDIA CONTENTS $id"
+        )
+
+        mediaContentsGenreRequestDto.genreList.forEach {
+            val genre = genreRepository.findById(it) ?: throw BadRequestException(
+                ErrorCode.ROW_DOES_NOT_EXIST,
+                "NO SUCH GENRE $it"
+            )
+
+            mediaContentsGenreRepository.save(MediaContentsGenre.of(mediaContents, genre))
+        }
+
+        return MediaContentsResponseDto.from(
+            mediaContents,
+            listOf(),
+            listOf(),
+            false
+        )
+    }
+
+    @Transactional
+    fun deleteMediaContentsGenre(
+        id: UUID,
+        mediaContentsGenreRequestDto: MediaContentsGenreRequestDto
+    ): MediaContentsResponseDto {
+        val mediaContents = mediaContentsRepository.findById(id) ?: throw BadRequestException(
+            ErrorCode.ROW_DOES_NOT_EXIST,
+            "NO SUCH MEDIA CONTENTS $id"
+        )
+
+        mediaContentsGenreRequestDto.genreList.forEach {
+            val genre = genreRepository.findById(it) ?: throw BadRequestException(
+                ErrorCode.ROW_DOES_NOT_EXIST,
+                "NO SUCH GENRE $it"
+            )
+
+            mediaContentsGenreRepository.delete(MediaContentsGenre.of(mediaContents, genre))
+        }
+
+        return MediaContentsResponseDto.from(
+            mediaContents,
             listOf(),
             listOf(),
             false

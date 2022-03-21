@@ -1,17 +1,12 @@
 package com.mediaservice.application.dto.user
 
-import com.mediaservice.domain.Profile
+import javax.validation.constraints.NotBlank
 
 data class ProfileUpdateRequestDto(
+    @field:NotBlank(message = "NAME IS NOT BLANK")
     val name: String,
+    @field:NotBlank(message = "RATE IS NOT BLANK")
     val rate: String,
+    @field:NotBlank(message = "PROFILE IMAGE IS NOT BLANK")
     val mainImage: String,
-) {
-    companion object {
-        fun from(profile: Profile) = ProfileUpdateRequestDto(
-            name = profile.name,
-            rate = profile.rate,
-            mainImage = profile.mainImage
-        )
-    }
-}
+)

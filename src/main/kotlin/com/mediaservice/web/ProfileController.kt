@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
+import javax.validation.Valid
 
 @RestController
 @RequestMapping("/api/v1/profiles")
@@ -34,7 +35,7 @@ class ProfileController(private val profileService: ProfileService) {
     @PostMapping
     fun create(
         @AuthenticationPrincipal userId: String,
-        @RequestBody profileCreateRequestDto: ProfileCreateRequestDto
+        @RequestBody @Valid profileCreateRequestDto: ProfileCreateRequestDto
     ): ProfileResponseDto? {
         return profileService.create(UUID.fromString(userId), profileCreateRequestDto)
     }
@@ -51,7 +52,7 @@ class ProfileController(private val profileService: ProfileService) {
     fun update(
         @AuthenticationPrincipal userId: String,
         @PathVariable profileId: UUID,
-        @RequestBody profileUpdateRequestDto: ProfileUpdateRequestDto
+        @RequestBody @Valid profileUpdateRequestDto: ProfileUpdateRequestDto
     ): ProfileResponseDto? {
         return this.profileService.update(UUID.fromString(userId), profileId, profileUpdateRequestDto)
     }

@@ -3,7 +3,7 @@ package com.mediaservice.application.dto.media
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.Positive
 
-data class MediaUpdateRequestDto(
+data class MediaCreateRequestDto(
     @field:NotBlank(message = "NAME IS NOT BLANK")
     val name: String,
     @field:NotBlank(message = "SYNOPSIS IS NOT BLANK")

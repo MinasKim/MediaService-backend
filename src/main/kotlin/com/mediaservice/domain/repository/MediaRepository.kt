@@ -4,6 +4,7 @@ import com.mediaservice.domain.Media
 import com.mediaservice.domain.MediaEntity
 import com.mediaservice.domain.MediaTable
 import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.insert
 import org.springframework.stereotype.Repository
 import java.util.UUID
 
@@ -25,8 +26,24 @@ class MediaRepository {
         }.toList()
     }
 
+    fun save(media: Media): Media {
+        media.id = (
+            MediaTable.insert {
+                it[name] = media.name
+                it[synopsis] = media.synopsis
+                it[order] = media.order
+                it[url] = media.url
+                it[thumbnail] = media.thumbnail
+                it[runningTime] = media.runningTime
+                it[isDeleted] = false
+                it[mediaSeries] = media.mediaSeries.id
+            } get MediaTable.id
+            ).value
+        return media
+    }
+
     fun update(media: Media): Media? {
-        return MediaEntity.findById(media.id)?.let {
+        return MediaEntity.findById(media.id!!)?.let {
             it.name = media.name
             it.synopsis = media.synopsis
             it.order = media.order

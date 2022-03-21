@@ -1,5 +1,6 @@
 package com.mediaservice.application
 
+import com.mediaservice.application.dto.media.MediaCreateRequestDto
 import com.mediaservice.application.dto.media.MediaResponseDto
 import com.mediaservice.application.dto.media.MediaUpdateRequestDto
 import com.mediaservice.application.validator.IdEqualValidator
@@ -8,6 +9,7 @@ import com.mediaservice.application.validator.Validator
 import com.mediaservice.domain.Media
 import com.mediaservice.domain.Profile
 import com.mediaservice.domain.repository.MediaRepository
+import com.mediaservice.domain.repository.MediaSeriesRepository
 import com.mediaservice.domain.repository.ProfileRepository
 import com.mediaservice.exception.BadRequestException
 import com.mediaservice.exception.ErrorCode
@@ -19,7 +21,8 @@ import java.util.UUID
 @Service
 class MediaService(
     private val profileRepository: ProfileRepository,
-    private val mediaRepository: MediaRepository
+    private val mediaRepository: MediaRepository,
+    private val mediaSeriesRepository: MediaSeriesRepository
 ) {
     @Transactional(readOnly = true)
     fun findById(
@@ -64,6 +67,32 @@ class MediaService(
         return this.mediaRepository.findByMediaSeriesId(id).map {
             MediaResponseDto.from(it)
         }
+    }
+
+    @Transactional
+    fun createMedia(
+        id: UUID,
+        mediaCreateRequestDto: MediaCreateRequestDto
+    ): MediaResponseDto {
+        val mediaSeries = this.mediaSeriesRepository.findById(id)
+            ?: throw BadRequestException(
+                ErrorCode.ROW_DOES_NOT_EXIST,
+                "NO SUCH MEDIA SERIES $id"
+            )
+
+        return MediaResponseDto.from(
+            this.mediaRepository.save(
+                Media.of(
+                    mediaCreateRequestDto.name,
+                    mediaCreateRequestDto.synopsis,
+                    mediaCreateRequestDto.order,
+                    mediaCreateRequestDto.url,
+                    mediaCreateRequestDto.thumbnail,
+                    mediaCreateRequestDto.runningTime,
+                    mediaSeries
+                )
+            )
+        )
     }
 
     @Transactional

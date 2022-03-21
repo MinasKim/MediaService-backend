@@ -19,7 +19,7 @@ object MediaTable : UUIDTable(name = "TB_MEDIA") {
 }
 
 class Media(
-    var id: UUID,
+    var id: UUID?,
     var name: String,
     var synopsis: String,
     var order: Int,
@@ -42,6 +42,26 @@ class Media(
             runningTime = mediaEntity.runningTime,
             isDeleted = mediaEntity.isDeleted,
             mediaSeries = MediaSeries.from(mediaEntity.mediaSeries)
+        )
+
+        fun of(
+            name: String,
+            synopsis: String,
+            order: Int,
+            url: String,
+            thumbnail: String,
+            runningTime: Int,
+            mediaSeries: MediaSeries
+        ) = Media(
+            id = null,
+            name = name,
+            synopsis = synopsis,
+            order = order,
+            url = url,
+            thumbnail = thumbnail,
+            runningTime = runningTime,
+            isDeleted = false,
+            mediaSeries = mediaSeries
         )
     }
 

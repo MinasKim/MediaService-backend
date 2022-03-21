@@ -13,6 +13,7 @@ import com.mediaservice.domain.MediaTable
 import com.mediaservice.domain.ProfileTable
 import com.mediaservice.domain.Role
 import com.mediaservice.domain.UserTable
+import com.mediaservice.domain.WishContentTable
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertAndGetId
@@ -27,12 +28,13 @@ class AppInitiator {
                 SchemaUtils.drop(
                     UserTable, ProfileTable, MediaTable, MediaSeriesTable, MediaContentsTable,
                     ActorTable, CreatorTable, GenreTable, MediaContentsActorTable, MediaContentsGenreTable,
-                    MediaContentsCreatorTable, LikeTable
+                    MediaContentsTable, LikeTable, WishContentTable
                 )
                 SchemaUtils.create(
                     UserTable, ProfileTable, MediaTable, MediaSeriesTable, MediaContentsTable,
                     ActorTable, CreatorTable, GenreTable, MediaContentsActorTable, MediaContentsGenreTable,
-                    MediaContentsCreatorTable, LikeTable
+                    MediaContentsCreatorTable, LikeTable, WishContentTable
+
                 )
 
                 UserTable.insert {
@@ -52,15 +54,18 @@ class AppInitiator {
                     )
                 }
 
+                val profileIds = ArrayList<UUID>()
                 for (i in userIds) {
                     for (j in 1..3) {
-                        ProfileTable.insert {
-                            it[user_id] = i
-                            it[name] = "프로필 $j"
-                            it[rate] = "19+"
-                            it[mainImage] = "프로필 ${j}의 메인 이미지"
-                            it[isDeleted] = false
-                        }
+                        profileIds.add(
+                            ProfileTable.insertAndGetId {
+                                it[user_id] = i
+                                it[name] = "프로필 $j"
+                                it[rate] = "19+"
+                                it[mainImage] = "프로필 ${j}의 메인 이미지"
+                                it[isDeleted] = false
+                            }.value
+                        )
                     }
                 }
 

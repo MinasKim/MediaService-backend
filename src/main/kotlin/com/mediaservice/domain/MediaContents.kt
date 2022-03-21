@@ -5,7 +5,6 @@ import org.jetbrains.exposed.dao.UUIDEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.Column
-import org.jetbrains.exposed.sql.Table
 import java.util.UUID
 
 object MediaContentsTable : UUIDTable(name = "TB_MEDIA_CONTENTS") {
@@ -100,22 +99,4 @@ class MediaContentsEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     var actorList by ActorEntity via MediaContentsActorTable
     var creatorList by CreatorEntity via MediaContentsCreatorTable
     var genreList by GenreEntity via MediaContentsGenreTable
-}
-
-object MediaContentsActorTable : Table() {
-    val mediaContents = reference("media_contents", MediaContentsTable)
-    val actor = reference("actor", ActorTable)
-    override val primaryKey = PrimaryKey(this.mediaContents, this.actor, name = "PK_MediaAllSeriesActor_mg_act")
-}
-
-object MediaContentsCreatorTable : Table() {
-    val mediaContents = reference("media_contents", MediaContentsTable)
-    val creator = reference("creator", CreatorTable)
-    override val primaryKey = PrimaryKey(this.mediaContents, this.creator, name = "PK_MediaAllSeriesDirector_mg_crt")
-}
-
-object MediaContentsGenreTable : Table() {
-    val mediaContents = reference("media_contents", MediaContentsTable)
-    val genre = reference("genre", GenreTable)
-    override val primaryKey = PrimaryKey(this.mediaContents, this.genre, name = "PK_MediaAllSeriesGenre_mg_gen")
 }

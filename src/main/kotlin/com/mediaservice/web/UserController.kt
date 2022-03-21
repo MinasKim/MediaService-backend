@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
+import javax.validation.Valid
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -24,7 +25,7 @@ class UserController(private val userService: UserService) {
     @PutMapping("/password")
     fun updatePassword(
         @AuthenticationPrincipal id: String,
-        @RequestBody passwordUpdateRequestDto: PasswordUpdateRequestDto
+        @RequestBody @Valid passwordUpdateRequestDto: PasswordUpdateRequestDto
     ): UserResponseDto {
         return this.userService.updatePassword(UUID.fromString(id), passwordUpdateRequestDto)
     }

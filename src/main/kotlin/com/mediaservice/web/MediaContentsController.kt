@@ -1,7 +1,10 @@
 package com.mediaservice.web
 
 import com.mediaservice.application.MediaContentsService
+import com.mediaservice.application.dto.media.MediaContentsActorRequestDto
 import com.mediaservice.application.dto.media.MediaContentsCreateRequestDto
+import com.mediaservice.application.dto.media.MediaContentsCreatorRequestDto
+import com.mediaservice.application.dto.media.MediaContentsGenreRequestDto
 import com.mediaservice.application.dto.media.MediaContentsResponseDto
 import com.mediaservice.application.dto.media.MediaContentsUpdateRequestDto
 import com.mediaservice.application.dto.media.MediaSeriesCreateRequestDto
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
+import javax.validation.Valid
 
 @RestController
 @RequestMapping("/api/v1/media-contents")
@@ -35,10 +39,10 @@ class MediaContentsController(private val mediaContentsService: MediaContentsSer
         )
     }
 
-    @PostMapping("/series/{id}")
+    @PostMapping("/{id}/series")
     fun createMediaSeries(
         @PathVariable id: UUID,
-        @RequestBody mediaSeriesCreateRequestDto: MediaSeriesCreateRequestDto
+        @RequestBody @Valid mediaSeriesCreateRequestDto: MediaSeriesCreateRequestDto
     ): MediaSeriesResponseDto {
         return this.mediaContentsService.createMediaSeries(
             id,
@@ -49,7 +53,7 @@ class MediaContentsController(private val mediaContentsService: MediaContentsSer
     @PutMapping("/series/{id}")
     fun updateMediaSeries(
         @PathVariable id: UUID,
-        @RequestBody mediaSeriesUpdateRequestDto: MediaSeriesUpdateRequestDto
+        @RequestBody @Valid mediaSeriesUpdateRequestDto: MediaSeriesUpdateRequestDto
     ): MediaSeriesResponseDto {
         return this.mediaContentsService.updateMediaSeries(id, mediaSeriesUpdateRequestDto)
     }
@@ -76,7 +80,7 @@ class MediaContentsController(private val mediaContentsService: MediaContentsSer
 
     @PostMapping
     fun createMediaContents(
-        @RequestBody mediaContentsCreateRequestDto: MediaContentsCreateRequestDto
+        @RequestBody @Valid mediaContentsCreateRequestDto: MediaContentsCreateRequestDto
     ): MediaContentsResponseDto {
         return this.mediaContentsService.createMediaContents(
             mediaContentsCreateRequestDto
@@ -86,7 +90,7 @@ class MediaContentsController(private val mediaContentsService: MediaContentsSer
     @PutMapping("/{id}")
     fun updateMediaContents(
         @PathVariable id: UUID,
-        @RequestBody mediaContentsUpdateRequestDto: MediaContentsUpdateRequestDto
+        @RequestBody @Valid mediaContentsUpdateRequestDto: MediaContentsUpdateRequestDto
     ): MediaContentsResponseDto {
         return this.mediaContentsService.updateMediaContents(id, mediaContentsUpdateRequestDto)
     }
@@ -96,5 +100,53 @@ class MediaContentsController(private val mediaContentsService: MediaContentsSer
         @PathVariable id: UUID
     ): MediaContentsResponseDto {
         return this.mediaContentsService.deleteMediaContentsById(id)
+    }
+
+    @PostMapping("/{id}/actor")
+    fun createMediaContentsActor(
+        @PathVariable id: UUID,
+        @RequestBody @Valid mediaContentsActorRequestDto: MediaContentsActorRequestDto
+    ): MediaContentsResponseDto {
+        return this.mediaContentsService.createMediaContentsActor(id, mediaContentsActorRequestDto)
+    }
+
+    @DeleteMapping("/{id}/actor")
+    fun deleteMediaContentsActor(
+        @PathVariable id: UUID,
+        @RequestBody @Valid mediaContentsActorRequestDto: MediaContentsActorRequestDto
+    ): MediaContentsResponseDto {
+        return this.mediaContentsService.deleteMediaContentsActor(id, mediaContentsActorRequestDto)
+    }
+
+    @PostMapping("/{id}/creator")
+    fun createMediaContentsCreator(
+        @PathVariable id: UUID,
+        @RequestBody @Valid mediaContentsCreatorRequestDto: MediaContentsCreatorRequestDto
+    ): MediaContentsResponseDto {
+        return this.mediaContentsService.createMediaContentsCreator(id, mediaContentsCreatorRequestDto)
+    }
+
+    @DeleteMapping("/{id}/creator")
+    fun deleteMediaContentsCreator(
+        @PathVariable id: UUID,
+        @RequestBody @Valid mediaContentsCreatorRequestDto: MediaContentsCreatorRequestDto
+    ): MediaContentsResponseDto {
+        return this.mediaContentsService.deleteMediaContentsCreator(id, mediaContentsCreatorRequestDto)
+    }
+
+    @PostMapping("/{id}/genre")
+    fun createMediaContentsGenre(
+        @PathVariable id: UUID,
+        @RequestBody @Valid mediaContentsGenreRequestDto: MediaContentsGenreRequestDto
+    ): MediaContentsResponseDto {
+        return this.mediaContentsService.createMediaContentsGenre(id, mediaContentsGenreRequestDto)
+    }
+
+    @DeleteMapping("/{id}/genre")
+    fun deleteMediaContentsGenre(
+        @PathVariable id: UUID,
+        @RequestBody @Valid mediaContentsGenreRequestDto: MediaContentsGenreRequestDto
+    ): MediaContentsResponseDto {
+        return this.mediaContentsService.deleteMediaContentsGenre(id, mediaContentsGenreRequestDto)
     }
 }

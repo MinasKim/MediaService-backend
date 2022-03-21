@@ -1,6 +1,7 @@
 package com.mediaservice
 
 import com.mediaservice.application.MediaService
+import com.mediaservice.application.dto.media.MediaCreateRequestDto
 import com.mediaservice.application.dto.media.MediaResponseDto
 import com.mediaservice.application.dto.media.MediaUpdateRequestDto
 import com.mediaservice.domain.Actor
@@ -13,12 +14,14 @@ import com.mediaservice.domain.Profile
 import com.mediaservice.domain.Role
 import com.mediaservice.domain.User
 import com.mediaservice.domain.repository.MediaRepository
+import com.mediaservice.domain.repository.MediaSeriesRepository
 import com.mediaservice.domain.repository.ProfileRepository
 import com.mediaservice.exception.BadRequestException
 import com.mediaservice.exception.ErrorCode
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkObject
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -28,7 +31,8 @@ import kotlin.test.assertEquals
 class MediaServiceTest {
     private var profileRepository = mockk<ProfileRepository>()
     private var mediaRepository = mockk<MediaRepository>()
-    private val mediaService: MediaService = MediaService(this.profileRepository, this.mediaRepository)
+    private var mediaSeriesRepository = mockk<MediaSeriesRepository>()
+    private val mediaService: MediaService = MediaService(this.profileRepository, this.mediaRepository, this.mediaSeriesRepository)
     private lateinit var media: Media
     private lateinit var mediaSeries: MediaSeries
     private lateinit var mediaContents: MediaContents
@@ -111,6 +115,51 @@ class MediaServiceTest {
 
         // then
         assertEquals(this.media.name, mediaList[0].name)
+    }
+
+    @Test
+    fun successCreateMedia() {
+        // given
+        mockkObject(Media)
+        val mediaCreateRequestDto = MediaCreateRequestDto(
+            "test video 1", "test synopsis", 1,
+            "test url", "test thumbnail", 100
+        )
+
+        every {
+            Media.of(
+                mediaCreateRequestDto.name, mediaCreateRequestDto.synopsis, mediaCreateRequestDto.order,
+                mediaCreateRequestDto.url, mediaCreateRequestDto.thumbnail, mediaCreateRequestDto.runningTime,
+                mediaSeries
+            )
+        } returns this.media
+        every { mediaSeriesRepository.findById(mediaSeriesId) } returns this.mediaSeries
+        every { mediaRepository.save(media) } returns this.media
+
+        // when
+        val mediaResponseDto = mediaService.createMedia(mediaSeriesId, mediaCreateRequestDto)
+
+        // then
+        assertEquals("test video 1", mediaResponseDto.name)
+    }
+
+    @Test
+    fun failCreateMedia_NoMediaSeries() {
+        val exception = assertThrows(BadRequestException::class.java) {
+            // given
+            val mediaCreateRequestDto = MediaCreateRequestDto(
+                "test video 1", "test synopsis", 1,
+                "test url", "test thumbnail", 100
+            )
+
+            every { mediaSeriesRepository.findById(mediaSeriesId) } returns null
+
+            // when
+            mediaService.createMedia(mediaSeriesId, mediaCreateRequestDto)
+        }
+
+        // then
+        assertEquals(ErrorCode.ROW_DOES_NOT_EXIST, exception.errorCode)
     }
 
     @Test
