@@ -4,9 +4,11 @@ import com.mediaservice.application.GenreService
 import com.mediaservice.application.dto.media.GenreCreateRequestDto
 import com.mediaservice.application.dto.media.GenreUpdateRequestDto
 import com.mediaservice.domain.Genre
+import com.mediaservice.domain.Profile
 import com.mediaservice.domain.Role
 import com.mediaservice.domain.User
 import com.mediaservice.domain.repository.GenreRepository
+import com.mediaservice.domain.repository.ProfileRepository
 import com.mediaservice.exception.BadRequestException
 import com.mediaservice.exception.ErrorCode
 import io.mockk.clearAllMocks
@@ -21,10 +23,13 @@ import kotlin.test.assertEquals
 
 class GenreServiceTest {
     private val genreRepository = mockk<GenreRepository>()
-    private val genreService: GenreService = GenreService(this.genreRepository)
+    private val profileRepository = mockk<ProfileRepository>()
+    private val genreService: GenreService = GenreService(this.genreRepository, this.profileRepository)
     private lateinit var genreId: UUID
     private lateinit var adminId: UUID
     private lateinit var userId: UUID
+    private lateinit var profileId: UUID
+    private lateinit var profile: Profile
     private lateinit var genre: Genre
     private lateinit var updatedGenre: Genre
     private lateinit var deletedGenre: Genre
@@ -37,11 +42,13 @@ class GenreServiceTest {
         this.genreId = UUID.randomUUID()
         this.adminId = UUID.randomUUID()
         this.userId = UUID.randomUUID()
+        this.profileId = UUID.randomUUID()
         this.genre = Genre(this.genreId, "test Genre", isDeleted = false)
         this.updatedGenre = Genre(this.genreId, "update Genre", isDeleted = false)
         this.deletedGenre = Genre(this.genreId, "test Genre", isDeleted = true)
         this.admin = User(this.adminId, "admin@gmail.com", "1234", Role.ADMIN)
         this.user = User(this.userId, "user@gmail.com", "1234", Role.USER)
+        this.profile = Profile(profileId, this.user, "test profile", "19+", "test.jpg", false)
     }
 
     @Test
@@ -152,26 +159,12 @@ class GenreServiceTest {
     fun findGenre() {
         // given
         every { genreRepository.findAll() } returns listOf(this.genre)
+        every { profileRepository.findById(profileId) } returns this.profile
 
         // when
-        val genres = this.genreService.findAll()
+        val genres = this.genreService.findAll(this.userId, this.profileId)
 
         // then
-        assertEquals(1, genres!!.size)
-    }
-
-    @Test
-    fun failFindGenre() {
-        // given
-        val exception = assertThrows(BadRequestException::class.java) {
-
-            every { genreRepository.findAll() } returns null
-
-            // when
-            val genres = this.genreService.findAll()
-        }
-
-        // then
-        assertEquals(ErrorCode.ROW_DOES_NOT_EXIST, exception.errorCode)
+        assertEquals(1, genres.size)
     }
 }

@@ -20,7 +20,7 @@ class CreatorRepository {
         }
     }
 
-    fun findAll(): List<Creator>? {
+    fun findAll(): List<Creator> {
         return CreatorEntity.all().map {
             Creator.from(it)
         }.toList()

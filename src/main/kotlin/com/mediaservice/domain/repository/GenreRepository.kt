@@ -20,7 +20,7 @@ class GenreRepository {
         }
     }
 
-    fun findAll(): List<Genre>? {
+    fun findAll(): List<Genre> {
         return GenreEntity.all().map {
             Genre.from(it)
         }.toList()

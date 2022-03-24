@@ -4,12 +4,14 @@ import com.mediaservice.application.CreatorService
 import com.mediaservice.application.dto.media.CreatorCreateRequestDto
 import com.mediaservice.application.dto.media.CreatorResponseDto
 import com.mediaservice.application.dto.media.CreatorUpdateRequestDto
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
@@ -41,7 +43,13 @@ class CreatorController(private val creatorService: CreatorService) {
     }
 
     @GetMapping
-    fun findAll(): List<CreatorResponseDto>? {
-        return this.creatorService.findAll()
+    fun findAll(
+        @AuthenticationPrincipal userId: String,
+        @RequestHeader(value = "profileId") profileId: String
+    ): List<CreatorResponseDto> {
+        return this.creatorService.findAll(
+            UUID.fromString(userId),
+            UUID.fromString(profileId)
+        )
     }
 }

@@ -20,7 +20,7 @@ class ActorRepository {
         }
     }
 
-    fun findAll(): List<Actor>? {
+    fun findAll(): List<Actor> {
         return ActorEntity.all().map {
             Actor.from(it)
         }.toList()

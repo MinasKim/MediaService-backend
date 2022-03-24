@@ -3,10 +3,13 @@ package com.mediaservice.application
 import com.mediaservice.application.dto.media.GenreCreateRequestDto
 import com.mediaservice.application.dto.media.GenreResponseDto
 import com.mediaservice.application.dto.media.GenreUpdateRequestDto
+import com.mediaservice.application.validator.IdEqualValidator
 import com.mediaservice.application.validator.IsDeletedValidator
 import com.mediaservice.application.validator.Validator
 import com.mediaservice.domain.Genre
+import com.mediaservice.domain.Profile
 import com.mediaservice.domain.repository.GenreRepository
+import com.mediaservice.domain.repository.ProfileRepository
 import com.mediaservice.exception.BadRequestException
 import com.mediaservice.exception.ErrorCode
 import com.mediaservice.exception.InternalServerException
@@ -16,7 +19,8 @@ import java.util.UUID
 
 @Service
 class GenreService(
-    private val genreRepository: GenreRepository
+    private val genreRepository: GenreRepository,
+    private val profileRepository: ProfileRepository
 ) {
     @Transactional
     fun create(genreCreateRequestDto: GenreCreateRequestDto): GenreResponseDto {
@@ -66,12 +70,23 @@ class GenreService(
         )
     }
 
-    @Transactional
-    fun findAll(): List<GenreResponseDto>? {
-        return this.genreRepository.findAll()?.map {
+    @Transactional(readOnly = true)
+    fun findAll(
+        userId: UUID,
+        profileId: UUID
+    ): List<GenreResponseDto> {
+        val profile = this.profileRepository.findById(profileId)
+            ?: throw BadRequestException(
+                ErrorCode.ROW_DOES_NOT_EXIST,
+                "NO SUCH PROFILE $profileId"
+            )
+
+        val validator = IsDeletedValidator(profile.isDeleted, Profile.DOMAIN)
+        validator.linkWith(IdEqualValidator(userId, profile.user.id!!))
+        validator.validate()
+
+        return this.genreRepository.findAll().map {
             GenreResponseDto.from(it)
-        }?.toList() ?: throw BadRequestException(
-            ErrorCode.ROW_DOES_NOT_EXIST, "THERE IS NO GENRE"
-        )
+        }.toList()
     }
 }
